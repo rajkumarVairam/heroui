@@ -4,8 +4,7 @@ import type {ValuesType} from "./use-tabs";
 
 import {forwardRef} from "@heroui/system";
 import {useDOMRef, filterDOMProps, mergeRefs} from "@heroui/react-utils";
-import {clsx, dataAttr} from "@heroui/shared-utils";
-import {chain, mergeProps} from "@react-aria/utils";
+import {clsx, dataAttr, chain, mergeProps} from "@heroui/shared-utils";
 import scrollIntoView from "scroll-into-view-if-needed";
 import {useFocusRing} from "@react-aria/focus";
 import {useTab} from "@react-aria/tabs";
@@ -42,7 +41,6 @@ const Tab = forwardRef<"button", TabItemProps>((props, ref) => {
     disableAnimation,
     disableCursorAnimation,
     shouldSelectOnPressUp,
-    onClick,
     tabRef,
     ...otherProps
   } = props;
@@ -112,8 +110,11 @@ const Tab = forwardRef<"button", TabItemProps>((props, ref) => {
         filterDOMProps(otherProps, {
           enabled: shouldFilterDOMProps,
           omitPropNames: new Set(["title"]),
+          // onClick is now from `tabProps`.
+          // omit it to avoid executing onClick it twice.
+          omitEventNames: new Set(["onClick"]),
         }),
-        {onClick: chain(handleClick, onClick, tabProps.onClick)},
+        {onClick: chain(handleClick, tabProps.onClick)},
       )}
       className={slots.tab?.({class: tabStyles})}
       title={otherProps?.titleValue}
